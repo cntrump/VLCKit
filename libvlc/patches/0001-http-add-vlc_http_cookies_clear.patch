@@ -1,0 +1,65 @@
+From e4f9f7b73e6f833b9696ebe03a0a655d20e30d06 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Fri, 16 Sep 2016 15:51:10 +0200
+Subject: [PATCH 01/17] http: add vlc_http_cookies_clear
+
+Clear all cookies without deleting the jar.
+---
+ include/vlc_http.h     | 1 +
+ src/libvlccore.sym     | 1 +
+ src/misc/httpcookies.c | 7 +++++--
+ 3 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/include/vlc_http.h b/include/vlc_http.h
+index 383a1ed354..33d04eb749 100644
+--- a/include/vlc_http.h
++++ b/include/vlc_http.h
+@@ -70,6 +70,7 @@ VLC_API char *vlc_http_auth_FormatAuthorizationHeader
+ typedef struct vlc_http_cookie_jar_t vlc_http_cookie_jar_t;
+ 
+ VLC_API vlc_http_cookie_jar_t * vlc_http_cookies_new( void ) VLC_USED;
++VLC_API void vlc_http_cookies_clear( vlc_http_cookie_jar_t * p_jar );
+ VLC_API void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar );
+ 
+ /**
+diff --git a/src/libvlccore.sym b/src/libvlccore.sym
+index b704d24f28..7c5c68c581 100644
+--- a/src/libvlccore.sym
++++ b/src/libvlccore.sym
+@@ -134,6 +134,7 @@ vlc_http_auth_ParseAuthenticationInfoHeader
+ vlc_http_auth_FormatAuthorizationHeader
+ vlc_http_cookies_new
+ vlc_http_cookies_destroy
++vlc_http_cookies_clear
+ vlc_http_cookies_store
+ vlc_http_cookies_fetch
+ httpd_ClientIP
+diff --git a/src/misc/httpcookies.c b/src/misc/httpcookies.c
+index f4c9682a9e..0e2898f4f6 100644
+--- a/src/misc/httpcookies.c
++++ b/src/misc/httpcookies.c
+@@ -280,7 +280,7 @@ vlc_http_cookie_jar_t * vlc_http_cookies_new(void)
+     return jar;
+ }
+ 
+-void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
++void vlc_http_cookies_clear( vlc_http_cookie_jar_t * p_jar )
+ {
+     if ( !p_jar )
+         return;
+@@ -289,8 +289,11 @@ void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
+         cookie_destroy( vlc_array_item_at_index( &p_jar->cookies, i ) );
+ 
+     vlc_array_clear( &p_jar->cookies );
+-    vlc_mutex_destroy( &p_jar->lock );
++}
+ 
++void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
++{
++    vlc_http_cookies_clear( p_jar );
+     free( p_jar );
+ }
+ 
+-- 
+2.21.1 (Apple Git-122.3)
+

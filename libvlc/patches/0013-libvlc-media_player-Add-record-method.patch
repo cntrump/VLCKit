@@ -1,0 +1,75 @@
+From 10b2bba36b7f2b2d6756ae779f91cd79c2e23a64 Mon Sep 17 00:00:00 2001
+From: Soomin Lee <bubu@mikan.io>
+Date: Wed, 31 Oct 2018 10:08:55 +0100
+Subject: [PATCH 13/17] libvlc: media_player: Add record method
+
+---
+ include/vlc/libvlc_media_player.h | 13 +++++++++++++
+ lib/media_player.c                | 20 ++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+
+diff --git a/include/vlc/libvlc_media_player.h b/include/vlc/libvlc_media_player.h
+index d4597e3353..fcb7e23ce6 100644
+--- a/include/vlc/libvlc_media_player.h
++++ b/include/vlc/libvlc_media_player.h
+@@ -2480,6 +2480,19 @@ LIBVLC_API int libvlc_media_player_get_role(libvlc_media_player_t *p_mi);
+  */
+ LIBVLC_API int libvlc_media_player_set_role(libvlc_media_player_t *p_mi,
+                                             unsigned role);
++/**
++ * Start/stop recording
++ *
++ * \version LibVLC 4.0.0 and later.
++ *
++ * \param p_mi media player
++ * \param enable true to start recording, false to stop
++ * \param path the path of the recording directory
++ * \return 0 on success, -1 on error
++ */
++LIBVLC_API int libvlc_media_player_record(libvlc_media_player_t *p_mi,
++                                          bool enable,
++                                          const char *path);
+ 
+ /** @} audio */
+ 
+diff --git a/lib/media_player.c b/lib/media_player.c
+index ec56b4bc6a..58eec27ae9 100644
+--- a/lib/media_player.c
++++ b/lib/media_player.c
+@@ -576,6 +576,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
+     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
+     var_Create (mp, "sout", VLC_VAR_STRING);
+     var_Create (mp, "demux-filter", VLC_VAR_STRING);
++    var_Create (mp, "input-record-path", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
+     var_Create (mp, "http-cookies", VLC_VAR_ADDRESS);
+ 
+     /* Video */
+@@ -1907,6 +1908,25 @@ int libvlc_media_player_get_role(libvlc_media_player_t *mp)
+     return ret;
+ }
+ 
++int libvlc_media_player_record( libvlc_media_player_t *p_mi,
++                                bool enable,
++                                const char *path)
++{
++    vlc_player_t *player = p_mi->player;
++    vlc_player_Lock(player);
++
++    vlc_value_t val = { .psz_string = (char *)path };
++
++    if(enable)
++        var_Set(p_mi, "input-record-path", val);
++
++    vlc_player_SetRecordingEnabled(player, enable);
++
++    vlc_player_Unlock(player);
++
++    return VLC_SUCCESS;
++}
++
+ #include <vlc_vout_display.h>
+ 
+ /* make sure surface structures from libvlc can be passed as such to vlc
+-- 
+2.21.1 (Apple Git-122.3)
+

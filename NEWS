@@ -1,0 +1,495 @@
+Version 4.0.0:
+--------------
+- Remove support for ARMv7s, use the regular ARMv7 slice instead
+- Removed all API deprecated in version 3
+- Rename buildMobileVLCKit to compileAndBuildVLCKit
+- Use NSDateComponents API for VLCTime.verboseStringValue
+
+Version 3.3.9:
+--------------
+- Bump dav1d to 0.5.1
+- Fix debug logging level
+- Fix iOS 9 no audio during playback
+
+Version 3.3.8:
+--------------
+- Compatibility fix with iOS/tvOS 13 when distributing on the App Store
+
+Version 3.3.7:
+--------------
+- VLCMedia:
+    - Add helper method to easily add option
+    - Add method to stop parsing
+
+- codec:
+    - avcodec: really drain video
+    - webvtt: fix node reparenting on closing tags
+
+- demux:
+    - ttml: recreate entities
+
+    - mp4:
+        - fix non packetized ms55
+        - fix quicktime sample size regression for twos/stwo
+
+    - h26x:
+        - fix frame duration
+        - use fmtout rate as date rate
+
+    - adaptive:
+        - store timeline directly
+        - inherit template defaults
+        - missing flags propagation using MimeDemuxer
+
+- packetizer:
+    - flac:
+        - check next header
+        - return a block even with invalid pts
+
+    - hevc:
+        - add secondary drain
+        - set fmtout rate when unknown
+
+    - h264:
+        - handle secondary drain
+        - do not override fmtin frame rate
+        - only use date_t for length computation
+
+    - mpegvideo: perform secondary drain
+
+- audiounit_ios: add support for > 48kHz sample rate
+
+- coreaudio:
+    - start deferred
+    - update the play date until the first rendering
+    - use the dev latency for the deferred calculation
+
+- vaapi: add YUVJ420P pixfmt
+- mp4: meta: fix format-truncation warning
+
+- access: add smb2 module
+
+- smb2/dsm: avoid to request the dialog two times
+- dsm:
+    - query credentials only when needed
+    - add "smb-force-v1" option
+    - specify the v1 protocol in the dialog credential title
+
+contrib: add libsmb2
+
+Version 3.3.6:
+--------------
+- Fix abort from dealloc when VLCMedia init failed
+- Fix SMB 2 not storing credentials
+
+Version 3.3.5:
+--------------
+- access: fix smb2/dsm conflicts
+- directsound: fix uninitialized var usage on error path
+- lib: media: fix media not being preparsed after a failure
+- packetizer: flac: don't increment invalid date
+- videotoolbox: don't reset the vout when closing
+
+Version 3.3.4:
+--------------
+- Fix SMB 2 possible null-deref when stopping a session
+
+- vout: fix low framerate stuttering
+- transcode: video: patch missing chroma in decoder format ouput
+- access: dvdread: fix null dereference on vts failure
+
+- demux:
+    - mp4: fix potential endless loop
+    - avi: simplify strf handling
+    - mkv: remove elements from vector when we delete them
+    - mkv: fix vector erase in destructor
+    - mkv: do not use the file if there's no usable stream/segment
+
+- faad: Fix read buffer overflow
+- ogg: Fix potential integer overflow
+- chromecast: transcode audio to MP3 320 kbps instead of 96 kbps
+
+- Bump libelml requirement to 1.3.6
+- Bump dav1d to 0.4.0
+- Bump libmodplug to 0.8.9.0
+
+Version 3.3.3:
+--------------
+- Fix airplay AV sync
+- Fix bluetooth audio drop
+- SMB2: Add support for NTLM anonymous login and port specification
+- Add MediaListPlayerDelegate callbacks:
+	- (void)mediaListPlayerFinishedPlayback:(VLCMediaListPlayer *)player;
+	- (void)mediaListPlayer:(VLCMediaListPlayer *)player;
+	- (void)mediaListPlayerStopped:(VLCMediaListPlayer *)player;
+
+Version 3.3.2:
+--------------
+
+- Internal percent encoding handling of URLs within VLCMedia was removed. This fixes a bug where URLs ended up double encoded.
+
+/!\ This change might require changes to client Apps to ensure that their URLs are correctly percent encoded when initialising VLCMedia /!\
+
+- access:
+        - rdp: Fix URI parsing
+        - vnc: Fix URI parsing
+        - live555: Fix crash parsing H264
+- demux:
+    - hls: Disable webvtt
+    - mp4: Add sample overread check for non seekable case
+                Probe fragments on missing duration
+                    Ignore indirect index references for seek
+Pack sidx items
+    - ts: Fix broken var reading
+- mux:
+    - mp4: Fix tkdh visible values
+            Set visible dimensions in stsd instead of buffer
+- contribs:
+    - Bump dav1d to 0.3.0
+
+Version 3.3.1:
+--------------
+
+- Lower SMB 2 priority
+- transcode: Fix transcode with passthrough video
+- asf: Fix memory leak
+- demux:
+    - dash: Handle infinite repeat in timeline
+    - mkv: Fix playback of files created with lavf 58.12
+- sftp: Fix version for ECDSA known hosts
+- contribs:
+    - Bump dav1d to 0.2.1
+
+Version 3.3.0:
+--------------
+
+- Add SMB 2 support
+- VLCMediaList: Fix removeMediaAtIndex NSRangeException crash
+- mp4: Improve muxing & demuxing
+- ogg: Improve demuxing
+- mkv: Fix GotoAndPlay command uid conversion
+- avcodec: Fix missing FourCC in libav
+- microdns: Fix memory leak
+
+API Changes:
+  VLCMediaList:
+   - indexOfMedia Returns NSUInteger instead of NSInteger
+   - removeMediaAtIndex Returns BOOL instead of void
+
+Version 3.2.1:
+--------------
+- Added a new default AV1 decoder - dav1d
+- Fixed issues with decoding certain HEVC streams
+- Added API to VLCLibrary to log debug information to a file or a custom target
+- Fixed crash and leaks in our OpenGL based video output
+- Fixed chromecast not displaying Videos for certain devices
+
+Version 3.2.0:
+--------------
+- Enabled libmux module
+- Fixed a bug where debuglogging logged less than what the loglevel indicated
+- Fixed a bug where subtitles where not displayed by default on iOS
+- Fixed a crash when playing back mkv on iOS 12
+
+- API Changes:
+    - updateProgressWithReference:message:postion: to updateProgressWithReference:message:position:
+
+- new recording Api
+VLCMediaPlayerDelegate:
+	- (void)mediaPlayerStartedRecording:(VLCMediaPlayer *)player;
+	- (void)mediaPlayer:(VLCMediaPlayer *)player recordingStoppedAtPath:(NSString *)path;
+VLCMediaPlayer:
+	- (BOOL)startRecordingAtPath:(NSString *)path;
+	- (BOOL)stopRecording;
+
+- new Transcoder Class and API
+VLCTranscoderDelegate:
+	- (void)transcode:(VLCTranscoder *)transcoder finishedSucessfully:(BOOL)success;
+VLCTranscoder:
+	- (BOOL)reencodeAndMuxSRTFile:(NSString *)srtPath toMP4File:(NSString *)mp4Path outputPath:(NSString *)outPath
+
+Version 3.1.5:
+--------------
+- Fixed a crash when updateProgressCallback was called
+- Fixed an issue with authentification for certain HTTP streams
+
+Version 3.1.4:
+--------------
+- Added missing VLCMediaParseStatusTimeout to VLCMediaParsedStatus enum
+- debugLoggingLevel of VLCLibrary defaults to 0 (just errors) when provided with an invalid level
+- Added VLCMedia initWithStream:(NSInputStream *)stream to create a new VLCMedia object to use an input stream.
+- Fixed VLCMediaThumbnailer dimensions not being updated after fetching a thumbnail
+- Fixed crash when cancelDialog was called on VLCDialogProvider
+
+Version 3.1.3:
+--------------
+- Fixed crashes with Chromecast when starting it in the middle of playing streams
+- Fixed Audio not resuming after backgrounding
+
+Version 3.1.2:
+--------------
+- Fix an issue that led to subtitles not being displayed for mkv files
+- h264 low-latency improvements for VideoToolbox
+- Improved display of subtitles
+- Fix playback issues with certain AVI, MP4 and MKV files
+
+Version 3.1.1:
+--------------
+- Drop support for platforms < iOS 8 & < tvOS 10.2
+- Add transcoding for the Chromecast
+- Fix an issue that led to green artifacts in H264 streams
+- Fix AVAudioSession handling on tvOS and iOS when playing multiple streams
+- Fix OpenGL multithreading issues on macOS
+- Updated third party libraries, notably Harfbuzz for security improvements
+
+Version 3.1.0:
+--------------
+- Add API to enable or disable deinterlace and specify a filter
+- Expose the existing snapshot API of the VLCMediaPlayer class to macOS
+- Expose yaw, pitch, roll and fov for viewpoint
+- Include protobuf, sout, output_http and stream_out modules for Chromecast
+
+Version 3.0.2:
+--------------
+- Automatic reconnections to HTTP(S) servers on unexpected drops on iOS and tvOS
+- Fixed deadlock when sent to background
+- Fixed some OpenGL and flv crashes
+- Fixed HEVC playback that resulted in just a black screen
+- Removal of private API usage by ffmpeg
+
+Version 3.0.0:
+--------------
+Generic changes:
+- Added support for tvOS
+- Removed support for the 32bit OS X platform
+- Added support for audio muting and software volume changes on iOS and tvOS
+
+New APIs:
+- VLCAudio
+  - setMuted:
+
+- VLCDialogProvider
+  - new class to handle user interaction with VLC events
+
+- VLCLibrary
+  - added properties: debugLogging, debugLoggingLevel
+
+- VLCMediaDiscoverer
+  - added selector: availableMediaDiscovererForCategoryType:
+  - added enum: VLCMediaDiscovererCategoryType
+
+- VLCMediaListPlayer
+  - added selectors: initWithDrawable:
+                     initWithOptions:andDrawable:
+                     playItemAtNumber:
+
+- VLCMediaPlayer
+  - added properties: titleDescriptions, indexOfLongestTitle, numberOfTitles,
+                      snapshots, lastSnapshot
+  - added selectors: chaptersForTitleIndex:
+                     numberOfChaptersForTitle:
+                     addPlaybackSlave:type:enforce:
+                     updateViewpoint:pitch:roll:fov:absolute:
+  - added notifications: VLCMediaPlayerTitleChanged, VLCMediaPlayerChapterChanged
+  - added enum: VLCMediaPlaybackSlaveType
+  - Note:
+    - play's return type was changed from BOOL to void
+    - hue is now a float instead of an integer
+  - WARNING:
+    - Return value of the following methods changed from INT_MAX to -1
+      (int)currentVideoTrackIndex
+      (int)currentVideoSubTitleIndex
+      (int)currentChapterIndex
+      (int)currentTitleIndex
+      (int)currentAudioTrackIndex
+
+- VLCMedia
+  - added keys: VLCMetaInformationTrackTotal, VLCMetaInformationDirector,
+                VLCMetaInformationSeason, VLCMetaInformationEpisode,
+                VLCMetaInformationShowName, VLCMetaInformationActors,
+                VLCMetaInformationAlbumArtist, VLCMetaInformationDiscNumber,
+                VLCMediaTracksInformationVideoOrientation,
+                VLCMediaTracksInformationVideoProjection
+  - added selectors: codecNameForFourCC:trackType:
+                     mediaType
+                     parseWithOptions:
+                     parseWithOptions:Timeout:
+                     parsedStatus
+                     storeCookie:forHost:path:
+                     clearStoredCookies
+  - added enums: VLCMediaType, VLCMediaParsingOptions, VLCMediaParsedStatus,
+                 VLCMediaOrientation, VLCMediaProjection
+  - changed behavior: media will no longer be parsed automatically if meta
+      data is requested prior to concluded parsing
+
+- VLCMediaList
+  - changed behavior: lists of media objects added through arrays or on init
+      are no longer added in reverse order
+
+- VLCTime
+  - added selectors: isEqual:
+                     hash
+
+- VLCAudio
+  - added property: passthrough
+
+Modified APIs:
+- VLCMediaList
+  - To match the KVC bindings, all NSInteger arguments were moved to NSUInteger as appropriate
+      - mediaList:mediaAdded:atIndex:
+      - mediaList:mediaRemovedAtIndex:
+      - addMedia:
+      - insertMedia:atIndex:
+      - removeMediaAtIndex:
+      - mediaAtIndex:
+
+Deprecated APIs:
+- VLCAudio
+  - setMute:
+- VLCMedia
+  - parse, isParsed, synchronousParse
+- VLCMediaDiscoverer
+  - availableMediaDiscoverer, localizedName
+- VLCMediaPlayer
+  - titles, chaptersForTitleIndex:, countOfTitles, framesPerSecond, openVideoSubTitlesFromFile:
+- VLCMediaListPlayer
+  - playItemAtIndex
+- VLCStreamSession
+- VLCStreamOutput
+- VLCMediaLibrary
+
+Removed APIs:
+- VLCExtension
+- VLCExtensionsManager
+- VLCMedia:
+  - fps
+  - media:metaValueChangedFrom:forKey:
+- VLCMediaPlayer
+  - audioTracks
+  - videoTracks
+  - videoSubTitles
+- VLCServicesDiscoverer
+- VLCPlaylistDataSource
+
+Version 2.2.2:
+--------------
+New APIs:
+- VLCMediaPlayer
+  - added properties: numberOfVideoTracks, numberOfSubtitlesTracks
+    numberOfAudioTracks
+
+Version 2.2.0:
+--------------
+
+Cross-platform:
+- Fixed deinterlacing if requested
+- Fixed decoding and display of Teletext-based subtitles
+- Improved thumbnailing reliability
+- Added support for inclusion in swift projects
+- Switched to Automatic Reference Counting
+- Various stability improvements
+
+MobileVLCKit:
+- It is finally possible to compile the framework without relying on third
+  party scripts
+- Added 2 sample projects illustrating video playback
+- Added support for https and hls playback
+- VLCMediaListPlayer is available now
+- Added support for https connectivity
+
+VLCKit:
+- VLCMediaThumbnailer is a public API on the Mac now matching the mobile
+  counterpart
+- Updated samples projects illustrating playback, file conversation, ...
+
+New APIs:
+- VLCMediaThumbnailer:
+  - added property: snapshotPosition to overwrite the default
+- VLCMediaListPlayer:
+  - added initWithOptions selector matching VLCMediaPlayer's implementation
+  - added pause selector
+  - added previous, next and playItemAtIndex selectors
+- VLCMedia:
+  - added delegate method mediaMetaDataDidChange
+- VLCMediaPlayer:
+  - added equalizer
+  - added countOfTitles
+
+Modified API behavior:
+- VLCMediaPlayer:
+  - implementing mediaPlayerTimeChanged and mediaPlayerStateChanged within a
+    delegate object is optional now
+- VLCMedia:
+  - nowPlaying meta information is correctly handled now
+
+Deprecated APIs:
+- VLCMedia:
+  - media:metaValueChangedFrom:forKey:
+
+Changes within VLCKit between 2.0.0 and 2.1.0:
+----------------------------------------------
+The entire framework was relicensed to LGPL 2.1 or later as well as its
+underlying playback modules.
+Support for transcoding and streaming as well as DVD playback was not affected
+by this move and stays under GPL until further notice.
+Please note that the Objective-C syntax was updated, so VLCKit may no longer
+compile with outdated versions of Xcode / clang.
+
+New APIs:
+- VLCStreamOutput:
+  - support for subtitle transcoding
+- VLCMedia:
+  - extended media track information for bitrate, language, description, source
+    aspect ratio, source aspect denominator, frame rate, frame rate denominator,
+    and text encoding
+  - added setter and getter for individual meta data values as well as the
+    ability to write changes to the media file
+  - added (BOOL)isMediaSizeSuitableForDevice to let VLCKit determine whether the
+    current media is considered to be suitable for the current device or
+    playback is discouraged. Will always return true on OS X devices.
+  - added individual getters for all statistic values, so client application can
+    fetch single values instead of having to process a NSDictionary with all the
+    available values. The old API is still available and will stay.
+- VLCMediaPlayer:
+  - added support to enable, switch and disable video tracks
+  - added setter/getter for SPU and audio delays
+  - added setter/getter for the video scale factor
+  - added support for the "adjust" video filter to manipulate contrast,
+    brightness, hue, saturation and gamma on the fly
+  - new interfaces to fetch names and IDs of audio, subtitle and video tracks
+  - added the ability to launch instances with custom libvlc options
+- VLCLibrary:
+  - added the ability to launch instances with custom libvlc options
+  - added methods to set App ID and User-Agent
+  - added readonly property to fetch compiler information
+
+Deprecated APIs:
+- VLCMediaPlayer:
+  @property (readonly) NSUInteger fps;
+    - use (float)fps instead.
+  - (NSArray *)videoSubTitles;
+    - use - (NSArray *)videoSubtitleNames; instead
+  - (NSArray *)audioTracks;
+    - use - (NSArray *)audioTrackNames; instead
+  - (NSArray *)videoTracks;
+    - use - (NSArray *)videoTrackNames; instead
+
+Modified behavior:
+- use of clang instead of llvm-gcc-4.2
+- updated project file for Xcode 4.3 and later
+- iOS Deployment target was raised to iOS 5.1
+- dropped support for the PowerPC architecture
+- Mac Deployment target was raised to OS X 10.7
+- different logging behavior: to see any debug messages, the framework needs
+  to be compiled in debug mode
+
+MobileVLCKit features:
+- added support for Opus
+- slimmed binary by removing dysfunctional or irrelevant modules
+- screen sleep is prevented during playback
+- functionality is strictly limited for full LGPL compliance
+
+Removed APIs:
+- VLCMedia:
+  - (void)setValue:(id)value forMeta:(NSString *)VLCMetaInformation;
+    use setMetadata:(NSString *)data forKey:(NSString *)key instead

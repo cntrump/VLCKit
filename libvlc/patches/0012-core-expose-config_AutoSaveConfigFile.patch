@@ -1,0 +1,64 @@
+From d13a39d5551db4943e1cedb72b7e39869cbf14e0 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Wed, 17 Jan 2018 10:06:13 +0200
+Subject: [PATCH 12/17] core: expose config_AutoSaveConfigFile
+
+---
+ include/vlc_configuration.h | 2 ++
+ src/config/configuration.h  | 1 -
+ src/config/file.c           | 1 +
+ src/libvlccore.sym          | 1 +
+ 4 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/vlc_configuration.h b/include/vlc_configuration.h
+index d4b8fc2473..155081b37b 100644
+--- a/include/vlc_configuration.h
++++ b/include/vlc_configuration.h
+@@ -243,6 +243,8 @@ VLC_API ssize_t config_GetPszChoices(const char *,
+ 
+ VLC_API int config_SaveConfigFile( vlc_object_t * );
+ #define config_SaveConfigFile(a) config_SaveConfigFile(VLC_OBJECT(a))
++VLC_API int  config_AutoSaveConfigFile( vlc_object_t * );
++#define config_AutoSaveConfigFile(a) config_AutoSaveConfigFile(VLC_OBJECT(a))
+ 
+ /**
+  * Resets the configuration.
+diff --git a/src/config/configuration.h b/src/config/configuration.h
+index ec19abc89e..c1bf31fc46 100644
+--- a/src/config/configuration.h
++++ b/src/config/configuration.h
+@@ -28,7 +28,6 @@ extern "C" {
+ /* Internal configuration prototypes and structures */
+ 
+ int  config_CreateDir( vlc_object_t *, const char * );
+-int  config_AutoSaveConfigFile( vlc_object_t * );
+ 
+ void config_Free (module_config_t *, size_t);
+ 
+diff --git a/src/config/file.c b/src/config/file.c
+index e6b10e5c02..4275a7ad00 100644
+--- a/src/config/file.c
++++ b/src/config/file.c
+@@ -527,6 +527,7 @@ error:
+     return -1;
+ }
+ 
++#undef config_AutoSaveConfigFile
+ int config_AutoSaveConfigFile( vlc_object_t *p_this )
+ {
+     int ret = 0;
+diff --git a/src/libvlccore.sym b/src/libvlccore.sym
+index 7c5c68c581..77c2034c6d 100644
+--- a/src/libvlccore.sym
++++ b/src/libvlccore.sym
+@@ -48,6 +48,7 @@ block_Realloc
+ block_Release
+ block_TryRealloc
+ config_AddIntf
++config_AutoSaveConfigFile
+ config_ChainCreate
+ config_ChainDestroy
+ config_ChainDuplicate
+-- 
+2.21.1 (Apple Git-122.3)
+
